@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Org Chart</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif; /* Added default font */
+        }
+        #orgChartContainer {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: #f8f8f8; /* Light background for the chart area */
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/2.1.32/go.js"></script>
+    <script>
+        function init() {
+            var $ = go.GraphObject.make;
+            var myDiagram =
+                $(go.Diagram, "orgChartContainer",
+                    {
+                        "undoManager.isEnabled": true,
+                        allowMove: false,
+                        layout: $(go.TreeLayout, // specify a TreeLayout
+                                  {
+                                    angle: 90,
+                                    layerSpacing: 45,
+                                    nodeSpacing: 15, // Adjusted spacing
+                                    alignment: go.TreeLayout.AlignmentBus // Revert to AlignmentBus
+                                  }),
+                        "initialContentAlignment": go.Spot.Center,
+                        "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom
+                    });
+
+           // Define the Node template (Simplified Structure)
+           myDiagram.nodeTemplate =
+                $(go.Node, "Auto", // Back to Auto Panel as the main container
+                    { selectionObjectName: "PANEL" },
+                    $(go.Shape, "RoundedRectangle", // The background/border shape
+                        { name: "SHAPE", fill: "white", stroke: "#CCCCCC", strokeWidth: 1 }),
+                    $(go.Panel, "Vertical", // Vertical panel for text elements
+                        { name: "PANEL", margin: new go.Margin(8, 10, 8, 10), defaultAlignment: go.Spot.Left },
+                        $(go.TextBlock, // Name
+                            { font: "bold 12pt Segoe UI, sans-serif", stroke: "#333333", margin: new go.Margin(4, 0, 2, 0) },
+                            new go.Binding("text", "key")),
+                        $(go.TextBlock, // Title
+                            { font: "10pt Segoe UI, sans-serif", stroke: "#555555", margin: new go.Margin(0, 0, 2, 0) },
+                            new go.Binding("text", "title")),
+                        $(go.TextBlock, // Location
+                            { font: "9pt Segoe UI, sans-serif", stroke: "#777777" },
+                            new go.Binding("text", "location"))
+                    )
+                    // TreeExpanderButton removed for now
+                ); // end Node
+
+            // Define the Link template (Simplified)
+            myDiagram.linkTemplate =
+              $(go.Link,
+                { selectable: false }, // Keep non-selectable
+                $(go.Shape, { strokeWidth: 2, stroke: "#666666" })); // Keep basic stroke
+
+            // Define the data model
+            myDiagram.model = new go.TreeModel([
+                 { key: "Sharon Bird", title: "Vice President GIS Technology Solutions", location: "Palmerston North" },
+                 { key: "Samantha Ottley", parent: "Sharon Bird", title: "Senior Director GIS Product Development", location: "Oamaru" },
+                 // Reports to Samantha Ottley
+                 { key: "Andy Cullen", parent: "Samantha Ottley", title: "Director Data and Analytics", location: "Christchurch" },
+                 { key: "Cory Brough", parent: "Samantha Ottley", title: "Director Business Analysis/Testing", location: "Invercargill" },
+                 { key: "Hamish Mills", parent: "Samantha Ottley", title: "Director GIS Development", location: "Christchurch" },
+                 // Reports to Andy Cullen
+                 { key: "Francois Herselman", parent: "Andy Cullen", title: "GIS Analyst", location: "Paraparaumu" },
+                 { key: "Logan Smith", parent: "Andy Cullen", title: "GIS Analyst", location: "Christchurch" },
+                 { key: "Qingsong Cai", parent: "Andy Cullen", title: "Senior GIS Analyst", location: "Auckland" },
+                  // Reports to Cory Brough
+                 { key: "Aliya Nurbekova", parent: "Cory Brough", title: "Business Analyst", location: "Christchurch" },
+                 { key: "Aslan Er", parent: "Cory Brough", title: "Senior Test Analyst", location: "Auckland" },
+                 { key: "Kishan Patel", parent: "Cory Brough", title: "Implementation Specialist", location: "Christchurch" },
+                 { key: "Nick Douglas", parent: "Cory Brough", title: "Senior Business Analyst", location: "Christchurch" },
+                 { key: "Liz Lin", parent: "Cory Brough", title: "Test Analyst", location: "Auckland" },
+                 // Reports to Hamish Mills
+                 { key: "Callum Smith", parent: "Hamish Mills", title: "Solutions Architect", location: "Auckland" },
+                 { key: "Chance Morris", parent: "Hamish Mills", title: "Solutions Architect - Product", location: "Christchurch" },
+                 { key: "James Goodyear", parent: "Hamish Mills", title: "IT/GIS Application Support", location: "Christchurch" },
+                 { key: "Neil Viviers", parent: "Hamish Mills", title: "GIS Developer", location: "Palmerston North" },
+                 { key: "Philip Guo", parent: "Hamish Mills", title: "Senior GIS Analyst", location: "Auckland" },
+                 { key: "Runumi Desai", parent: "Hamish Mills", title: "Senior GIS Analyst", location: "Christchurch" },
+                 { key: "Steven Lau", parent: "Hamish Mills", title: "Senior GIS Developer", location: "Auckland" },
+                 { key: "Yugendra Bharat", parent: "Hamish Mills", title: "Senior GIS Developer", location: "Auckland" },
+             ]);
+        }
+        // Ensure init is called after the DOM is ready
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        } else {
+            init();
+        }
+    </script>
+</head>
+<body> <!-- Removed onload, using DOMContentLoaded listener now -->
+    <div id="orgChartContainer"></div>
+</body>
+</html>
